@@ -1,0 +1,40 @@
+# CogniCore Q&A stack.
+#
+# Quick start:
+#   docker compose up --build
+#
+# Ollama starts empty, so after the first `up` pull the model once (it is then
+# kept in the named volume across restarts):
+#   docker compose exec ollama ollama pull llama3.2
+#
+# The app indexes the docs on startup and serves the UI at http://localhost:8000.
+#
+# Using Groq instead of Ollama?
+#   - Set LLM_PROVIDER=groq and GROQ_API_KEY in a .env file (see .env.example).
+#   - You can then delete/skip the `ollama` service and the `depends_on` below.
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ollama
+    environment:
+      - LLM_PROVIDER=ollama
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=llama3.2
+    volumes:
+      # Persist the vector store across container restarts.
+      - chroma_data:/app/chroma_db
+
+volumes:
+  ollama_models:
+  chroma_data:

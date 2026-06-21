@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CogniCore Q&amp;A</title>
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --card: #ffffff;
+      --text: #1f2933;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --accent-disabled: #93b4f5;
+      --border: #e2e5ea;
+      --error: #b42318;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 20px 64px;
+    }
+    h1 { font-size: 1.6rem; margin: 0 0 4px; }
+    .subtitle { color: var(--muted); margin: 0 0 28px; font-size: 0.95rem; }
+    .ask-row { display: flex; gap: 8px; }
+    #question {
+      flex: 1;
+      padding: 12px 14px;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--card);
+      color: var(--text);
+    }
+    #question:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+    button {
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:disabled { background: var(--accent-disabled); cursor: not-allowed; }
+    .status { margin-top: 20px; color: var(--muted); font-size: 0.95rem; }
+    .error {
+      margin-top: 20px;
+      padding: 12px 14px;
+      background: #fef3f2;
+      border: 1px solid #fda29b;
+      color: var(--error);
+      border-radius: 8px;
+    }
+    .answer-card {
+      margin-top: 24px;
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .answer-text { white-space: pre-wrap; margin: 0; }
+    .sources { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .sources h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 0 0 8px; }
+    .sources ul { margin: 0; padding-left: 18px; }
+    .sources li { font-size: 0.9rem; color: var(--text); margin-bottom: 4px; }
+    .sources .section { color: var(--muted); }
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      margin-right: 8px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: -2px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CogniCore Q&amp;A</h1>
+    <p class="subtitle">Ask a question about the CogniCore documentation.</p>
+
+    <div class="ask-row">
+      <input
+        id="question"
+        type="text"
+        placeholder="e.g. How do I reset my password?"
+        autocomplete="off"
+      />
+      <button id="ask-btn" type="button">Ask</button>
+    </div>
+
+    <div id="output" aria-live="polite"></div>
+  </div>
+
+  <script>
+    const input = document.getElementById("question");
+    const button = document.getElementById("ask-btn");
+    const output = document.getElementById("output");
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function renderLoading() {
+      output.innerHTML = '<p class="status"><span class="spinner"></span>Thinking…</p>';
+    }
+
+    function renderError(message) {
+      output.innerHTML = '<div class="error">' + escapeHtml(message) + "</div>";
+    }
+
+    function renderAnswer(data) {
+      let html = '<div class="answer-card">';
+      html += '<p class="answer-text">' + escapeHtml(data.answer) + "</p>";
+
+      if (data.sources && data.sources.length) {
+        html += '<div class="sources"><h2>Sources</h2><ul>';
+        for (const s of data.sources) {
+          html +=
+            "<li>" +
+            escapeHtml(s.source) +
+            ' <span class="section">— ' +
+            escapeHtml(s.section) +
+            "</span></li>";
+        }
+        html += "</ul></div>";
+      }
+      html += "</div>";
+      output.innerHTML = html;
+    }
+
+    async function ask() {
+      const question = input.value.trim();
+      if (!question) {
+        input.focus();
+        return;
+      }
+
+      button.disabled = true;
+      renderLoading();
+
+      try {
+        const response = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question }),
+        });
+
+        if (!response.ok) {
+          let detail = "Request failed (HTTP " + response.status + ").";
+          try {
+            const err = await response.json();
+            if (err && err.detail) detail = err.detail;
+          } catch (_) { /* non-JSON error body */ }
+          renderError(detail);
+          return;
+        }
+
+        const data = await response.json();
+        renderAnswer(data);
+      } catch (_) {
+        renderError("Could not reach the server. Is the API running?");
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    button.addEventListener("click", ask);
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") ask();
+    });
+    input.focus();
+  </script>
+</body>
+</html>
