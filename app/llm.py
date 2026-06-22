@@ -1,11 +1,9 @@
-"""LLM provider abstraction.
+# LLM provider abstraction.
 
-Defines a minimal provider interface and a concrete Ollama implementation,
-selected at runtime via ``settings.llm_provider``. Keeping generation behind an
-interface lets the rest of the app stay agnostic to the backend.
-"""
+# Defines a minimal provider interface and a concrete Ollama implementation,
+# selected at runtime via ``settings.llm_provider``. Keeping generation behind an
+# interface lets the rest of the app stay agnostic to the backend.
 
-from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
@@ -49,7 +47,7 @@ class OllamaProvider(LLMProvider):
         except httpx.HTTPError as exc:
             raise RuntimeError(
                 f"Could not reach Ollama at {self.base_url}. Is it running "
-                f"(`ollama serve`) and is model {self.model!r} pulled? ({exc})"
+                f"(`ollama serve`) and is model {self.model} pulled? ({exc})"
             ) from exc
         return response.json()["response"]
 
@@ -59,7 +57,7 @@ def get_llm_provider() -> LLMProvider:
     provider = settings.llm_provider.lower()
     if provider == "ollama":
         return OllamaProvider()
-    raise ValueError(f"Unsupported LLM_PROVIDER: {settings.llm_provider!r}")
+    raise ValueError(f"Unsupported LLM_PROVIDER: {settings.llm_provider}")
 
 
 llm = get_llm_provider()

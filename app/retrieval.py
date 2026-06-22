@@ -1,10 +1,8 @@
-"""Semantic retrieval: turn a question into the most relevant chunks.
+# Semantic retrieval: turn a question into the most relevant chunks.
 
-Thin orchestration layer that embeds the query and searches the vector store,
-returning typed results. Embedding and storage logic live in their own modules.
-"""
+# Thin orchestration layer that embeds the query and searches the vector store,
+# returning typed results. Embedding and storage logic live in their own modules.
 
-from __future__ import annotations
 
 import sys
 from dataclasses import dataclass

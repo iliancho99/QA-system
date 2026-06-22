@@ -1,13 +1,13 @@
-"""Retrieval-augmented generation: retrieve context, then synthesize an answer.
+# Retrieval-augmented generation: retrieve context, then synthesize an answer.
 
-Ties the retrieval layer to the LLM. The model is instructed to answer strictly
-from the retrieved context so answers stay grounded in the document corpus.
-"""
+# Ties the retrieval layer to the LLM. The model is instructed to answer strictly
+# from the retrieved context so answers stay grounded in the document corpus.
 
-from __future__ import annotations
+
 
 from app.llm import llm
 from app.retrieval import RetrievalResult, retrieve
+from app.schemas import SourceInfo
 
 SYSTEM_PROMPT = (
     "You are a helpful assistant that answers questions using ONLY the provided "
@@ -31,18 +31,6 @@ def build_context(results: list[RetrievalResult]) -> str:
     return "\n\n".join(blocks)
 
 
-def _unique_sources(results: list[RetrievalResult]) -> list[dict]:
-    """Return distinct (source, section) pairs, preserving retrieval order."""
-    seen: set[tuple[str, str]] = set()
-    sources: list[dict] = []
-    for result in results:
-        key = (result.source, result.section)
-        if key not in seen:
-            seen.add(key)
-            sources.append({"source": result.source, "section": result.section})
-    return sources
-
-
 def ask(question: str) -> dict:
     """Answer ``question`` from the document corpus.
 
@@ -56,4 +44,5 @@ def ask(question: str) -> dict:
         "Answer using only the context above."
     )
     answer = llm.generate(user_prompt, system_prompt=SYSTEM_PROMPT)
-    return {"answer": answer, "sources": _unique_sources(results)}
+    sources = [SourceInfo(source=r.source, section=r.section) for r in results]
+    return {"answer": answer, "sources": sources}

@@ -1,12 +1,10 @@
-"""Text embedding via sentence-transformers.
+# Text embedding via sentence-transformers.
 
-Wraps a single sentence-transformers model behind a small interface. The model
-is loaded lazily on first use and reused for the lifetime of the process, since
-loading is expensive relative to encoding.
-"""
+# Wraps a single sentence-transformers model behind a small interface. The model
+# is loaded lazily on first use and reused for the lifetime of the process, since
+# loading is expensive relative to encoding.
 
 from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 from app.config import settings

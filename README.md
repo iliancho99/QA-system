@@ -156,8 +156,6 @@ python -m pytest tests/ -v
   so answers appear progressively instead of after a blocking wait.
 - **Authentication & rate limiting** — add API keys/auth and per-client rate
   limits before any public exposure.
-- **Token-based chunking** — chunk by model tokens rather than characters to use
-  the context window more precisely and consistently across documents.
 - **Evaluation pipeline** — golden Q&A pairs plus automated faithfulness/relevance
   scoring to track quality over time.
 - **CI/CD** — automated tests, linting, and image builds on every commit, with
@@ -165,10 +163,3 @@ python -m pytest tests/ -v
 - **Monitoring & logging** — structured query logs, latency metrics, and
   retrieval relevance scores to observe and debug the system in production.
 
-## Use of AI assistants
-
-Used Claude for architecture planning, code scaffolding, and debugging. The full
-conversation log is in `ai-conversations/`. Each step was reviewed and tested
-before being committed — the assistant's output was verified by running the
-ingestion, retrieval, API, and test suite at each stage rather than accepted
-blindly.

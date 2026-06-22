@@ -1,11 +1,9 @@
-"""CLI: build chunks, embed them, and index them into the vector store.
+# CLI: build chunks, embed them, and index them into the vector store.
 
-Run with::
+# Run with::
 
-    python -m scripts.ingest
-"""
+#     python -m scripts.ingest
 
-from __future__ import annotations
 
 from app.config import settings
 from app.embeddings import embedder

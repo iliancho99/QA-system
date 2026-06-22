@@ -1,11 +1,8 @@
-"""Document loading and chunking.
+# Document loading and chunking.
 
-Reads markdown documents from the docs directory and splits them into
-section-aware chunks. No embeddings are produced here — this stage only
-prepares the text units that will later be embedded and stored.
-"""
-
-from __future__ import annotations
+# Reads markdown documents from the docs directory and splits them into
+# section-aware chunks. No embeddings are produced here — this stage only
+# prepares the text units that will later be embedded and stored.
 
 import re
 from dataclasses import dataclass
@@ -124,8 +121,3 @@ def build_chunks(docs_dir: str) -> list[Chunk]:
 if __name__ == "__main__":
     documents = load_documents(settings.docs_dir)
     chunks = build_chunks(settings.docs_dir)
-    print(f"Total docs:   {len(documents)}")
-    print(f"Total chunks: {len(chunks)}")
-    for chunk in chunks[:2]:
-        preview = chunk.text[:80].replace("\n", " ")
-        print(f"  - {chunk.source} | {chunk.section} | {preview!r}")

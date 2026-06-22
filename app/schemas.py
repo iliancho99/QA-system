@@ -1,6 +1,5 @@
-"""Pydantic request/response models for the HTTP API."""
+# Pydantic request/response models for the HTTP API.
 
-from __future__ import annotations
 
 from pydantic import BaseModel, Field
 

@@ -1,4 +1,4 @@
-"""Application configuration loaded from environment / .env file."""
+# Application configuration loaded from environment / .env file.
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 

@@ -1,12 +1,11 @@
-"""Persistent vector store backed by ChromaDB.
+# Persistent vector store backed by ChromaDB.
 
-Stores chunk embeddings on disk and exposes cosine-similarity search. The
-collection is configured for cosine distance so that scores reflect semantic
-similarity regardless of embedding magnitude.
-"""
+# Stores chunk embeddings on disk and exposes cosine-similarity search. The
+# collection is configured for cosine distance so that scores reflect semantic
+# similarity regardless of embedding magnitude.
+
 
 from __future__ import annotations
-
 import logging
 from typing import TYPE_CHECKING
 
