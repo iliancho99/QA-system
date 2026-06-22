@@ -126,10 +126,7 @@ python -m pytest tests/ -v
   zero toolchain, instant to serve from FastAPI, easy to read. A richer app
   would justify React, but here it would add tooling overhead for no benefit.
 
-- **Deterministic chunk IDs for idempotent re-indexing.** Each chunk gets a
-  stable id of the form `{source}::{index}`, and indexing uses upsert. Re-running
-  ingestion therefore updates existing chunks in place instead of creating
-  duplicates, making re-indexing safe to run repeatedly.
+
 
 ## Testing approach
 
